@@ -1,3 +1,4 @@
+""" Requires: bin/custom_pb.dll """
 import ctypes
 import os
 
