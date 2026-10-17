@@ -1,4 +1,4 @@
-import cuspb
+import custom_pb as cuspb
 import time
 import random
 
@@ -11,7 +11,7 @@ def rgb_bar():
     
     for i in range(101):
         pb.percent = i
-        pb.fgtruecol(r,g,b)
+        pb.fg = f"\033[38;2;{r};{g};{b}m"
 
         rand_ms = random.randint(0,100)/1000
         print(f"\r{pb.getsmoothbar()} {pb.percent}% ",end="",flush=True)
@@ -40,9 +40,9 @@ def rgb_bar():
     print("\n")
 
 
-def default_bar(col):  
+def default_bar(col: str):  
     pb = cuspb.init_bar()
-    pb.fgextdcol(col)
+    pb.fg = col
 
     for i in range(101):
         pb.percent = i

@@ -1,7 +1,7 @@
 #include "custom_pb.h"
 #include <time.h>
 
-const int max_cd = 100; // max value of cooldown
+const int MAX_RANDOM = 100; // max value of delay
 
 
 void rgb_bar(void) 
@@ -12,15 +12,14 @@ void rgb_bar(void)
     int step = 15;
     
     for (int i = 0; i <= 100; i++) {
-        pb.PERCENT = i;
-        fgtruecol(&pb, r,g,b);
-
-        int rand_ms = rand() % (max_cd+1);
+        pb.PERCENT = i; // update percent
+        fgtruecol(&pb, r,g,b); // update color
         
-        char* bar = getsmoothbar(&pb);
-        printf("\r%s %d%% ",bar,i);
-        free(bar);
+        char* bar = getsmoothbar(&pb); // get a dynamic string
+        printf("\r%s %d%% ",bar,i); // print this string with \r
+        free(bar); // clear this string
 
+        // check the current values of color and update them
         if (r == 255 && b == 0 && g < 255) {
             g += step;
             if (g > 255) g = 255;
@@ -42,37 +41,38 @@ void rgb_bar(void)
         }
 
         fflush(stdout);
-        Sleep(rand_ms);
+
+        int rand_ms = rand() % (MAX_RANDOM+1); // get a random number from 0 to MAX_RANDOM
+        Sleep(rand_ms); // simulate a delay
     }
     putchar('\n');
 }
 
+
 void default_bar(int col) 
-{   
+{ 
     BAR pb = init_bar();
     fgextdcol(&pb,col);
 
     for (int i = 0; i <= 100; i++) {
-        pb.PERCENT = i;
-        int rand_ms = rand() % (max_cd+1);
+        pb.PERCENT = i; // update percent
         
         putchar('\r');
-        printsmbar(pb);
+        printsmbar(&pb); // call automatic bar output
         printf(" %d%% ",i);
 
         fflush(stdout);
-        Sleep(rand_ms);
+
+        int rand_ms = rand() % (MAX_RANDOM+1); // get a random number from 0 to MAX_RANDOM
+        Sleep(rand_ms); // simulate a delay
     }
     putchar('\n');
 }
 
-int main(void) 
-{
-    srand((unsigned int)time(NULL));
 
+int main(void) {
     init_console();
-    default_bar(2);
-    putchar('\n');
+    srand((unsigned int)time(NULL)); // random reset
     rgb_bar();
 
     return 0;
