@@ -37,7 +37,7 @@ class Bar:
     
     @percent.setter
     def percent(self, percent: int):
-        if not self.chkpercent():
+        if 0 <= percent <= 100:
             self.__bar.PERCENT = percent
         else:
             raise ValueError("invalid percent value")
@@ -47,7 +47,7 @@ class Bar:
     
     @width.setter
     def width(self, width: int):
-        if not self.chkwidth():
+        if 0 <= width <= 1000:
             self.__bar.WIDTH = width
         else:
             raise ValueError("invalid width value")
