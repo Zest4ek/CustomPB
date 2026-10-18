@@ -21,8 +21,8 @@ typedef struct {
 void init_console(void);    // enable UTF-8 and support of ANSI-colors
 BAR init_bar(void);         // set default value for the bar
 
-bool chkpercent(const BAR* pb);               // percent value check
-bool chkwidth(const BAR* pb);                 // width value check
+bool chkpercent(const BAR* pb);         // percent value check
+bool chkwidth(const BAR* pb);           // width value check
 bool chkfgstdcol(int col);              // standard color value check (foreground)
 bool chkbgstdcol(int col);              // standard color value check (background)
 bool chkextdcol(int col);               // extended color value check
@@ -39,8 +39,8 @@ void bgtruecol(BAR* pb, int r, int g, int b);   // set background true color
 
 char* getstrbar(const BAR* pb);       // get a bar as a dynamic string 
 char* getsmoothbar(const BAR* pb);    // get a smooth bar as a dynamic string
-void printbar(const BAR* pb);          // output a bar to the console
-void printsmbar(const BAR* pb);        // output a smooth bar to the console
+void printbar(const BAR* pb);         // output a bar to the console
+void printsmbar(const BAR* pb);       // output a smooth bar to the console
 
 
 #endif 
