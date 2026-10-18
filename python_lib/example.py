@@ -1,3 +1,5 @@
+""" Source: https://github.com/Zest4ek/CustomPB/python_lib/example.py """
+
 import custom_pb as cuspb
 import time
 import random
@@ -10,12 +12,12 @@ def rgb_bar():
     step = 15
     
     for i in range(101):
-        pb.percent = i
-        pb.fg = f"\033[38;2;{r};{g};{b}m"
+        pb.percent = i # update percent
+        pb.fg = f"\033[38;2;{r};{g};{b}m" # update color
 
-        rand_ms = random.randint(0,100)/1000
-        print(f"\r{pb.getsmoothbar()} {pb.percent}% ",end="",flush=True)
+        print(f"\r{pb} {pb.percent}% ",end="",flush=True)
 
+        # check the current values of color and update them
         if r == 255 and b == 0 and g < 255:
             g += step
             if g > 255: g = 255
@@ -35,22 +37,23 @@ def rgb_bar():
             b -= step
             if b < 0: b = 0
 
-        time.sleep(rand_ms)
+        rand_ms = random.randint(0,100)/1000
+        time.sleep(rand_ms) # simulate a delay
 
     print("\n")
 
 
 def default_bar(col: str):  
     pb = cuspb.init_bar()
-    pb.fg = col
+    pb.fg = col # set a color
 
     for i in range(101):
-        pb.percent = i
+        pb.percent = i # update percent
+
+        print(f"\r{pb} {pb.percent}% ",end="",flush=True)
 
         rand_ms = random.randint(0,100)/1000
-        print(f"\r{pb.getsmoothbar()} {pb.percent}% ",end="",flush=True)
-
-        time.sleep(rand_ms)
+        time.sleep(rand_ms) # simulate a delay
 
     print("\n")
 
