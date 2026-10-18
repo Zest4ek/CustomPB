@@ -167,7 +167,7 @@ class Bar:
 
 
 def init_console(): return _c_lib.init_console() # enable UTF-8 and support of ANSI-colors
-def init_bar() -> Bar: return Bar(0,30,"\033[0m","\033[100m") # set default value for the bar
+def init_bar() -> Bar: return Bar(0,30,"\033[37m","\033[100m") # set default value for the bar
 
 def chkfgstdcol(col: int): return _c_lib.chkfgstdcol(col) # standard color value check (foreground)
 def chkbgstdcol(col: int): return _c_lib.chkfgstdcol(col) # standard color value check (background)
