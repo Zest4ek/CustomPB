@@ -1,6 +1,9 @@
-""" Requires: bin/custom_pb.dll """
+""" 
+Source: https://github.com/Zest4ek/CustomPB/python_lib/custom_pb.py
+Requires: bin/custom_pb.dll
+"""
 import ctypes
-import os
+from pathlib import Path
 
 
 class _C_BAR(ctypes.Structure):
@@ -14,53 +17,62 @@ class _C_BAR(ctypes.Structure):
 
 class Bar:
     def __init__(self, percent: int, width: int, fg: str, bg: str):
-        self.pb = _C_BAR(
-            PERCENT=percent if 0 <= percent <= 100 else 0,
-            WIDTH=width if 0 <= width <= 1000 else 30,
-            FOREGROUND=fg.encode("utf-8")[:19],
-            BACKGROUND=bg.encode("utf-8")[:19]
+        if not 0 <= percent <= 100: raise ValueError("invalid percent value")
+        elif not 0 <= width <= 1000: raise ValueError("invalid width value")
+        elif len(fg) > 19: raise MemoryError("foreground value is too large")
+        elif len(bg) > 19: raise MemoryError("background value is too large")
+
+        self.__bar = _C_BAR(
+            PERCENT=percent,
+            WIDTH=width,
+            FOREGROUND=fg.encode("utf-8"),
+            BACKGROUND=bg.encode("utf-8")
         )
 
+    def __str__(self):
+        return self.getsmoothbar()
+
     @property
-    def percent(self) -> int: return self.pb.PERCENT
+    def percent(self) -> int: return self.__bar.PERCENT
     
     @percent.setter
     def percent(self, percent: int):
         if not self.chkpercent():
-            self.pb.PERCENT = percent
+            self.__bar.PERCENT = percent
         else:
             raise ValueError("invalid percent value")
 
     @property
-    def width(self) -> int: return self.pb.WIDTH
+    def width(self) -> int: return self.__bar.WIDTH
     
     @width.setter
     def width(self, width: int):
         if not self.chkwidth():
-            self.pb.WIDTH = width
+            self.__bar.WIDTH = width
         else:
             raise ValueError("invalid width value")
 
 
     @property
-    def fg(self) -> str: return self.pb.FOREGROUND.decode("utf-8")
+    def fg(self) -> str: return self.__bar.FOREGROUND.decode("utf-8")
 
     @fg.setter
     def fg(self, fg: str):
-        if not fg.startswith("\033[") or not fg.endswith("m"):
+        if len(fg) > 19: raise MemoryError("foreground value is too large")
+        elif not fg.startswith("\033[") or not fg.endswith("m"):
             raise ValueError("foreground must be an ANSI-color")
         
         try:
-            colstr = fg[2:-1]
-            colors = [int(col) for col in colstr.split(';')]
+            colstr = fg[2:-1] # throw \033[ and m
+            colors = [int(col) for col in colstr.split(';')] # split a string into indexes
         except ValueError:
             raise ValueError("invalid ANSI-color value")
 
         if colors[0] == 38:
-            if len(colors) < 2:
-                raise ValueError("invalid ANSI-color index value")
+            if len(colors) < 3:
+                raise ValueError("invalid non-standard color format (excepted 38;5;N or 38;2;R;G;B)")
             
-            if colors[1] == 2:
+            elif colors[1] == 2:
                 if len(colors) == 5:
                     if chktruecol(colors[2],colors[3],colors[4]): self.fgtruecol(colors[2], colors[3], colors[4])
                     else: raise ValueError("invalid ANSI-color index value")
@@ -86,24 +98,25 @@ class Bar:
         
     @property
     def bg(self) -> str:
-        return self.pb.BACKGROUND.decode("utf-8")
+        return self.__bar.BACKGROUND.decode("utf-8")
     
     @bg.setter
     def bg(self, bg: str):
-        if not bg.startswith("\033[") or not bg.endswith("m"):
+        if len(bg) > 19: raise MemoryError("background value is too large")
+        elif not bg.startswith("\033[") or not bg.endswith("m"):
             raise ValueError("background must be an ANSI-color")
         
         try:
-            colstr = bg[2:-1]
-            colors = [int(col) for col in colstr.split(';')]
+            colstr = bg[2:-1] # throw \033[ and m
+            colors = [int(col) for col in colstr.split(';')] # split a string into indexes
         except ValueError:
             raise ValueError("invalid ANSI-color value")
-
+        
         if colors[0] == 48:
-            if len(colors) < 2:
-                raise ValueError("invalid ANSI-color index value")
+            if len(colors) < 3:
+                raise ValueError("invalid non-standard color format (excepted 48;5;N or 48;2;R;G;B)")
             
-            if colors[1] == 2:
+            elif colors[1] == 2:
                 if len(colors) == 5:
                     if chktruecol(colors[2],colors[3],colors[4]): self.bgtruecol(colors[2], colors[3], colors[4])
                     else: raise ValueError("invalid ANSI-color index value")
@@ -127,44 +140,56 @@ class Bar:
             raise ValueError("invalid ANSI-color index value")
         
 
-    def chkpercent(self): _c_lib.chkpercent(ctypes.byref(self.pb))
-    def chkwidth(self): _c_lib.chkwidth(ctypes.byref(self.pb))
+    def chkpercent(self): _c_lib.chkpercent(ctypes.byref(self.__bar)) # percent value check
+    def chkwidth(self): _c_lib.chkwidth(ctypes.byref(self.__bar)) # width value check
 
-    def setfgnul(self): _c_lib.setfgnul(ctypes.byref(self.pb))
-    def setbgnul(self): _c_lib.setbgnul(ctypes.byref(self.pb))
-    def fgstdcol(self, col: int): _c_lib.fgstdcol(ctypes.byref(self.pb), col)
-    def bgstdcol(self, col: int): _c_lib.bgstdcol(ctypes.byref(self.pb), col)
-    def fgextdcol(self, col: int): _c_lib.fgextdcol(ctypes.byref(self.pb), col)
-    def bgextdcol(self, col: int): _c_lib.bgextdcol(ctypes.byref(self.pb), col)
-    def fgtruecol(self, r: int, g: int, b: int): _c_lib.fgtruecol(ctypes.byref(self.pb), r,g,b)
-    def bgtruecol(self, r: int, g: int, b: int): _c_lib.bgtruecol(ctypes.byref(self.pb), r,g,b)
+    def setfgnul(self): _c_lib.setfgnul(ctypes.byref(self.__bar)) # clear foreground
+    def setbgnul(self): _c_lib.setbgnul(ctypes.byref(self.__bar)) # clear background
+    def fgstdcol(self, col: int): _c_lib.fgstdcol(ctypes.byref(self.__bar), col) # set foreground standard color
+    def bgstdcol(self, col: int): _c_lib.bgstdcol(ctypes.byref(self.__bar), col) # set background standard color
+    def fgextdcol(self, col: int): _c_lib.fgextdcol(ctypes.byref(self.__bar), col) # set foreground extended color
+    def bgextdcol(self, col: int): _c_lib.bgextdcol(ctypes.byref(self.__bar), col) # set background extended color
+    def fgtruecol(self, r: int, g: int, b: int): _c_lib.fgtruecol(ctypes.byref(self.__bar), r,g,b) # set foreground true color
+    def bgtruecol(self, r: int, g: int, b: int): _c_lib.bgtruecol(ctypes.byref(self.__bar), r,g,b) # set background true color
 
     def getstrbar(self) -> str:
-        res = _c_lib.getstrbar(ctypes.byref(self.pb))
+        """ Gets a string bar """
+        res = _c_lib.getstrbar(ctypes.byref(self.__bar))
         return res.decode('utf-8') if res else ""
 
     def getsmoothbar(self) -> str:
-        res = _c_lib.getsmoothbar(ctypes.byref(self.pb))
+        """ Gets a smooth string bar """
+        res = _c_lib.getsmoothbar(ctypes.byref(self.__bar))
         return res.decode('utf-8') if res else ""
 
     def printbar(self): print(self.getstrbar(),end="")
     def printsmbar(self): print(self.getsmoothbar(),end="")
 
 
-def init_console(): return _c_lib.init_console()
-def init_bar() -> Bar: return Bar(0,30,"\033[0m","\033[100m")
+def init_console(): return _c_lib.init_console() # enable UTF-8 and support of ANSI-colors
+def init_bar() -> Bar: return Bar(0,30,"\033[0m","\033[100m") # set default value for the bar
 
-def chkfgstdcol(col: int): return _c_lib.chkfgstdcol(col)
-def chkbgstdcol(col: int): return _c_lib.chkfgstdcol(col)
-def chkextdcol(col: int): return _c_lib.chkextdcol(col)
-def chktruecol(r: int, g: int, b: int): return _c_lib.chktruecol(r,g,b)
+def chkfgstdcol(col: int): return _c_lib.chkfgstdcol(col) # standard color value check (foreground)
+def chkbgstdcol(col: int): return _c_lib.chkfgstdcol(col) # standard color value check (background)
+def chkextdcol(col: int): return _c_lib.chkextdcol(col) # extended color value check
+def chktruecol(r: int, g: int, b: int): return _c_lib.chktruecol(r,g,b) # true color value check
 
 
-lib_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "bin", "custom_pb.dll"))
-try:
-    _c_lib = ctypes.CDLL(lib_path)
-except OSError:
-    _c_lib = ctypes.CDLL("custom_pb.dll")
+""" Searching for the custom_pb.dll library """
+script_dir = Path(__file__).resolve().parent
+parent_dir = script_dir.parent
+dll_name = "custom_pb.dll"
+
+search_dirs = [script_dir, parent_dir] + [p for p in parent_dir.iterdir() if p.is_dir() and p != script_dir]
+
+for folder in search_dirs:
+    dll_path = folder / dll_name
+    if dll_path.is_file():
+        _c_lib = ctypes.CDLL(str(dll_path)) # load received dll
+        break
+else:
+    raise FileNotFoundError("couldnt find the required library custom_pb.dll")
+
 
 _c_lib.init_console.restype = None
 _c_lib.init_console.argtypes = []
@@ -215,3 +240,4 @@ _c_lib.printbar.restype = None
 _c_lib.printbar.argtypes = [ctypes.POINTER(_C_BAR)]
 _c_lib.printsmbar.restype = None
 _c_lib.printsmbar.argtypes = [ctypes.POINTER(_C_BAR)]
+
