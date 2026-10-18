@@ -16,7 +16,7 @@ void rgb_bar(void)
         fgtruecol(&pb, r,g,b); // update color
         
         char* bar = getsmoothbar(&pb); // get a dynamic string
-        printf("\r%s %d%% ",bar,i);
+        printf("\r%s %d%% ",bar,i); // print this string with \r
         free(bar); // clear this string
 
         // check the current values of color and update them

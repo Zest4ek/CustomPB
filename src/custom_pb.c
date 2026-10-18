@@ -1,5 +1,3 @@
-/* Source: https://github.com/Zest4ek/CustomPB/src/custom_pb.c */
-
 #include "custom_pb.h"
 
 

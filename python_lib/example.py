@@ -10,12 +10,12 @@ def rgb_bar():
     step = 15
     
     for i in range(101):
-        pb.percent = i # update percent
-        pb.fg = f"\033[38;2;{r};{g};{b}m" # update color
+        pb.percent = i
+        pb.fg = f"\033[38;2;{r};{g};{b}m"
 
-        print(f"\r{pb} {pb.percent}% ",end="",flush=True)
+        rand_ms = random.randint(0,100)/1000
+        print(f"\r{pb.getsmoothbar()} {pb.percent}% ",end="",flush=True)
 
-        # check the current values of color and update them
         if r == 255 and b == 0 and g < 255:
             g += step
             if g > 255: g = 255
@@ -35,23 +35,22 @@ def rgb_bar():
             b -= step
             if b < 0: b = 0
 
-        rand_ms = random.randint(0,100)/1000
-        time.sleep(rand_ms) # simulate a delay
+        time.sleep(rand_ms)
 
     print("\n")
 
 
 def default_bar(col: str):  
     pb = cuspb.init_bar()
-    pb.fg = col # set a color
+    pb.fg = col
 
     for i in range(101):
-        pb.percent = i # update percent
-
-        print(f"\r{pb} {pb.percent}% ",end="",flush=True)
+        pb.percent = i
 
         rand_ms = random.randint(0,100)/1000
-        time.sleep(rand_ms) # simulate a delay
+        print(f"\r{pb.getsmoothbar()} {pb.percent}% ",end="",flush=True)
+
+        time.sleep(rand_ms)
 
     print("\n")
 
