@@ -140,8 +140,8 @@ class Bar:
             raise ValueError("invalid ANSI-color index value")
         
 
-    def chkpercent(self): _c_lib.chkpercent(ctypes.byref(self.__bar)) # percent value check
-    def chkwidth(self): _c_lib.chkwidth(ctypes.byref(self.__bar)) # width value check
+    def chkpercent(self): return _c_lib.chkpercent(ctypes.byref(self.__bar)) # percent value check
+    def chkwidth(self): return _c_lib.chkwidth(ctypes.byref(self.__bar)) # width value check
 
     def setfgnul(self): _c_lib.setfgnul(ctypes.byref(self.__bar)) # clear foreground
     def setbgnul(self): _c_lib.setbgnul(ctypes.byref(self.__bar)) # clear background
