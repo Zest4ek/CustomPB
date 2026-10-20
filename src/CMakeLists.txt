@@ -1,3 +1,5 @@
+# Source: https://github.com/Zest4ek/CustomPB/src/CMakeLists.txt
+
 cmake_minimum_required(VERSION 3.30)
 
 project(CUSTOM_PB LANGUAGES C)

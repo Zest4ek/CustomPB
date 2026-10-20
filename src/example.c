@@ -1,3 +1,5 @@
+/* Source: https://github.com/Zest4ek/CustomPB/src/example.c */
+
 #include "custom_pb.h"
 #include <time.h>
 
@@ -16,7 +18,7 @@ void rgb_bar(void)
         fgtruecol(&pb, r,g,b); // update color
         
         char* bar = getsmoothbar(&pb); // get a dynamic string
-        printf("\r%s %d%% ",bar,i); // print this string with \r
+        printf("\r%s %d%% ",bar,i);
         free(bar); // clear this string
 
         // check the current values of color and update them

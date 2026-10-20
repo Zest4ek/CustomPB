@@ -24,12 +24,6 @@ BAR init_bar(void) {
 }
 
 
-bool chkpercent(const BAR* pb) { 
-    return (pb != NULL) && (pb->PERCENT >= 0 && pb->PERCENT <= 100);
-}
-bool chkwidth(const BAR* pb) { 
-    return (pb != NULL) && (pb->WIDTH > 0 && pb->WIDTH <= 1000);
-}
 bool chkfgstdcol(int col) {
     return (col >= 30 && col <= 37) || (col >= 90 && col <= 97);
 }
@@ -89,7 +83,7 @@ void bgtruecol(BAR* pb, int r, int g, int b) {
 
 char* getstrbar(const BAR* pb)
 {
-    if (!(chkpercent(pb) && chkwidth(pb))) return NULL;
+    if (!(pb->PERCENT >= 0 && pb->PERCENT <= 100) && (pb->WIDTH > 0 && pb->WIDTH <= 1000)) return NULL;
 
     int total_ticks = (pb->PERCENT*pb->WIDTH*8)/100; // total number of ticks
     int full_ticks = total_ticks/8;                  // total number of ticks for full blocks
@@ -112,7 +106,7 @@ char* getstrbar(const BAR* pb)
 
 char* getsmoothbar(const BAR* pb) 
 {
-    if (!(chkpercent(pb) && chkwidth(pb))) return NULL;
+    if (!(pb->PERCENT >= 0 && pb->PERCENT <= 100) && (pb->WIDTH > 0 && pb->WIDTH <= 1000)) return NULL;
 
     char block_char[4] = FULL_BLOCK;
     int total_ticks = (pb->PERCENT*pb->WIDTH*8)/100; // total number of ticks
