@@ -23,6 +23,11 @@ typedef struct {
 void init_console(void);    // enable UTF-8 and support of ANSI-colors
 BAR init_bar(void);         // set default value for the bar
 
+<<<<<<< HEAD
+=======
+bool chkpercent(const BAR* pb);         // percent value check
+bool chkwidth(const BAR* pb);           // width value check
+>>>>>>> 5617f8bc129600b43d3643ce7ee36cb7aeccf027
 bool chkfgstdcol(int col);              // standard color value check (foreground)
 bool chkbgstdcol(int col);              // standard color value check (background)
 bool chkextdcol(int col);               // extended color value check

@@ -164,10 +164,10 @@ class Bar:
 
 
 def init_console(): return _c_lib.init_console() # enable UTF-8 and support of ANSI-colors
-def init_bar() -> Bar: return Bar(0,30,"\033[0m","\033[100m") # set default value for the bar
+def init_bar() -> Bar: return Bar(0,30,"\033[37m","\033[100m") # set default value for the bar
 
 def chkfgstdcol(col: int): return _c_lib.chkfgstdcol(col) # standard color value check (foreground)
-def chkbgstdcol(col: int): return _c_lib.chkbgstdcol(col) # standard color value check (background)
+def chkbgstdcol(col: int): return _c_lib.chkfgstdcol(col) # standard color value check (background)
 def chkextdcol(col: int): return _c_lib.chkextdcol(col) # extended color value check
 def chktruecol(r: int, g: int, b: int): return _c_lib.chktruecol(r,g,b) # true color value check
 
@@ -232,3 +232,4 @@ _c_lib.printbar.restype = None
 _c_lib.printbar.argtypes = [ctypes.POINTER(_C_BAR)]
 _c_lib.printsmbar.restype = None
 _c_lib.printsmbar.argtypes = [ctypes.POINTER(_C_BAR)]
+
